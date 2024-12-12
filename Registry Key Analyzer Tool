@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Windows Defender Registry Change Analyzer</title>
+    <title>Windows Defender Registry Modification Analyzer</title>
     <style>
         body {
             font-family: 'Courier New', Courier, monospace;
@@ -112,7 +112,6 @@
                 font-size: 0.9em;
             }
         }
-
     </style>
 </head>
 <body>
@@ -120,11 +119,11 @@
         <h1>Windows Defender Registry Change Analyzer</h1>
         <form id="analyzerForm">
             <div class="input-box">
-                <label for="currentValue">Paste Current Registry Value Data:</label>
+                <label for="currentValue">Paste Current Value Data:</label>
                 <textarea id="currentValue" name="currentValue" required></textarea>
             </div>
             <div class="input-box">
-                <label for="changedFrom">Paste Changed-From Registry Value Data:</label>
+                <label for="changedFrom">Paste Changed From Value Data:</label>
                 <textarea id="changedFrom" name="changedFrom" required></textarea>
             </div>
             <button type="submit">Analyze Changes</button>
@@ -138,68 +137,28 @@
         document.getElementById('analyzerForm').addEventListener('submit', function (e) {
             e.preventDefault();
 
-            // Get the current and previous registry value data
+            // Get the current and previous value data
             const currentValue = document.getElementById('currentValue').value.trim();
             const changedFrom = document.getElementById('changedFrom').value.trim();
-
-            // Split the values by '|' to extract key components
-            const currentParts = currentValue.split('|').map(val => val.trim());
-            const changedFromParts = changedFrom.split('|').map(val => val.trim());
 
             // Prepare the results container
             let results = '';
 
-            // Ensure both inputs have valid values (must have RegistryKey, ValueName, ValueType, ValueData)
-            if (currentParts.length === 4 && changedFromParts.length === 4) {
-                const [currentKey, currentName, currentType, currentData] = currentParts;
-                const [previousKey, previousName, previousType, previousData] = changedFromParts;
-
-                // Start comparing and highlight meaningful changes
-                let changes = '';
-                let changeDetected = false;
-
-                // Compare registry key path (optional, for full context comparison)
-                if (currentKey !== previousKey) {
-                    changes += `Registry Key Path: ${previousKey} → ${currentKey}\n`;
-                    changeDetected = true;
-                }
-
-                // Compare Value Name (may not always change)
-                if (currentName !== previousName) {
-                    changes += `Value Name: ${previousName} → ${currentName}\n`;
-                    changeDetected = true;
-                }
-
-                // Compare Value Type (e.g., REG_SZ, REG_DWORD)
-                if (currentType !== previousType) {
-                    changes += `Value Type: ${previousType} → ${currentType}\n`;
-                    changeDetected = true;
-                }
-
-                // Compare Value Data
-                if (currentData !== previousData) {
-                    changes += `Value Data: ${previousData} → ${currentData}\n`;
-                    changeDetected = true;
-                }
-
-                // If changes are detected, show the results
-                if (changeDetected) {
-                    results = `
-Detected Changes:
-${changes}
-                    `;
-                }
+            // Check if the values are different
+            if (currentValue && changedFrom && currentValue !== changedFrom) {
+                results = `
+Meaningful Changes Detected:
+- Value Data changed from: "${changedFrom}"
+- To: "${currentValue}"`;
+            } else if (currentValue === changedFrom) {
+                results = 'No changes detected between the Current Value Data and the Changed From Value Data.';
             } else {
-                results = "Invalid input format. Ensure the data includes Registry Key, Value Name, Value Type, and Value Data.";
+                results = 'Invalid input: Ensure both fields are populated and properly formatted.';
             }
 
-            // Display the results if changes are detected, otherwise show a no change message
-            if (results.trim() !== '') {
-                document.getElementById('output').textContent = results.trim();
-                document.getElementById('results').style.display = 'block';
-            } else {
-                document.getElementById('results').style.display = 'none';
-            }
+            // Display the results
+            document.getElementById('output').textContent = results.trim();
+            document.getElementById('results').style.display = 'block';
         });
     </script>
 </body>
