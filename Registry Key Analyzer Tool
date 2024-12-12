@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registry Key Analyzer Tool</title>
+    <style>
+        body {
+            font-family: 'Courier New', Courier, monospace;
+            background-color: #0d1117;
+            color: #c9d1d9;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .container {
+            text-align: center;
+            background-color: #161b22;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0, 255, 0, 0.3);
+            width: 90%;
+            max-width: 600px;
+        }
+        h1 {
+            margin-bottom: 20px;
+            color: #00ff00;
+        }
+        .input-box {
+            margin: 10px 0;
+            width: 100%;
+        }
+        input, textarea, button {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            border: none;
+            border-radius: 5px;
+            font-size: 1em;
+        }
+        input, textarea {
+            background-color: #0d1117;
+            color: #c9d1d9;
+            border: 1px solid #3a3d41;
+        }
+        textarea {
+            height: 100px;
+        }
+        button {
+            background-color: #00ff00;
+            color: #0d1117;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #006400;
+        }
+        .results {
+            margin-top: 20px;
+            background-color: #0d1117;
+            color: #c9d1d9;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #3a3d41;
+        }
+        @media (max-width: 500px) {
+            h1 {
+                font-size: 1.5em;
+            }
+            input, textarea, button {
+                font-size: 0.9em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Registry Key Analyzer Tool</h1>
+        <form id="analyzerForm">
+            <div class="input-box">
+                <label for="originalKey">Paste Original Registry Key:</label>
+                <textarea id="originalKey" name="originalKey" required></textarea>
+            </div>
+            <div class="input-box">
+                <label for="newKey">Paste New Registry Key:</label>
+                <textarea id="newKey" name="newKey" required></textarea>
+            </div>
+            <button type="submit">Analyze Changes</button>
+        </form>
+        <div id="results" class="results" style="display: none;">
+            <h2>Results:</h2>
+            <pre id="output"></pre>
+        </div>
+    </div>
+ <script>
+    document.getElementById('analyzerForm').addEventListener('submit', function (e) {
+        e.preventDefault();
+
+        // Get the original and new keys
+        const originalKey = document.getElementById('originalKey').value.trim();
+        const newKey = document.getElementById('newKey').value.trim();
+
+        // Split the keys by '|' to handle multiple values
+        const originalValues = originalKey.split('|').map(val => val.trim());
+        const newValues = newKey.split('|').map(val => val.trim());
+
+        // Prepare results
+        let results = '';
+        const maxLength = Math.max(originalValues.length, newValues.length);
+
+        // Compare each key-value pair
+        for (let i = 0; i < maxLength; i++) {
+            const originalValue = originalValues[i] || 'None';
+            const newValue = newValues[i] || 'None';
+
+            if (originalValue !== newValue) {
+                // Extract file names (last part after the last backslash)
+                const originalFileName = originalValue.split('\\').pop();
+                const newFileName = newValue.split('\\').pop();
+
+                results += `
+Key ${i + 1}:
+Original Value: ${originalValue}
+Changes: ${originalFileName} was changed to ${newFileName}
+`;
+            } else {
+                results += `
+Key ${i + 1}:
+Original Value: ${originalValue}
+No Changes
+`;
+            }
+        }
+
+        // Display the results
+        document.getElementById('output').textContent = results.trim();
+        document.getElementById('results').style.display = 'block';
+    });
+</script>
+</body>
+</html>
