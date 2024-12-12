@@ -168,12 +168,16 @@
                 const [originalKeyPath, originalDataType, originalDataValue] = originalValue.split('|');
                 const [newKeyPath, newDataType, newDataValue] = newValue.split('|');
 
-                if (originalKeyPath !== newKeyPath || originalDataType !== newDataType || originalDataValue !== newDataValue) {
-                    // Extract file names (last part after the last backslash) for comparison
-                    const originalFileName = originalKeyPath.split('\\').pop();
-                    const newFileName = newKeyPath.split('\\').pop();
+                // Check for undefined values (we'll skip comparing if any part is undefined)
+                if (originalKeyPath && originalDataType && originalDataValue &&
+                    newKeyPath && newDataType && newDataValue) {
 
-                    results += `
+                    if (originalKeyPath !== newKeyPath || originalDataType !== newDataType || originalDataValue !== newDataValue) {
+                        // Extract file names (last part after the last backslash) for comparison
+                        const originalFileName = originalKeyPath.split('\\').pop();
+                        const newFileName = newKeyPath.split('\\').pop();
+
+                        results += `
 Key ${i + 1}:
 Original Key Path: ${originalKeyPath}
 Original Data Type: ${originalDataType}
@@ -188,15 +192,16 @@ Key Path: ${originalFileName} was changed to ${newFileName}
 Data Type: ${originalDataType} was changed to ${newDataType}
 Data Value: ${originalDataValue} was changed to ${newDataValue}
 `;
+                    }
                 }
             }
 
-            // Display the results only if there are changes
+            // Display the results only if there are defined changes
             if (results.trim() !== '') {
                 document.getElementById('output').textContent = results.trim();
                 document.getElementById('results').style.display = 'block';
             } else {
-                // Hide the results if there are no changes
+                // Hide the results if no changes or undefined values
                 document.getElementById('results').style.display = 'none';
             }
         });
