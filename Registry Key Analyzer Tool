@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Windows Defender Registry Modification Analyzer</title>
+    <title>Windows Defender Registry Change Analyzer</title>
     <style>
         body {
             font-family: 'Courier New', Courier, monospace;
@@ -141,23 +141,28 @@
             const currentValue = document.getElementById('currentValue').value.trim();
             const changedFrom = document.getElementById('changedFrom').value.trim();
 
-            // Prepare the results container
-            let results = '';
+            // Split the data into sets of strings, disregarding order
+            const currentSet = new Set(currentValue.split(',').map(val => val.trim()).filter(Boolean));
+            const changedFromSet = new Set(changedFrom.split(',').map(val => val.trim()).filter(Boolean));
 
-            // Check if the values are different
-            if (currentValue && changedFrom && currentValue !== changedFrom) {
-                results = `
-Meaningful Changes Detected:
-- Value Data changed from: "${changedFrom}"
-- To: "${currentValue}"`;
-            } else if (currentValue === changedFrom) {
-                results = 'No changes detected between the Current Value Data and the Changed From Value Data.';
-            } else {
-                results = 'Invalid input: Ensure both fields are populated and properly formatted.';
+            // Determine additions and removals
+            const additions = [...currentSet].filter(item => !changedFromSet.has(item));
+            const removals = [...changedFromSet].filter(item => !currentSet.has(item));
+
+            // Prepare results
+            let results = '';
+            if (additions.length > 0) {
+                results += `Added Values:\n- ${additions.join('\n- ')}`;
+            }
+            if (removals.length > 0) {
+                results += `${results ? '\n\n' : ''}Removed Values:\n- ${removals.join('\n- ')}`;
+            }
+            if (!results) {
+                results = 'No changes detected in Value Data.';
             }
 
             // Display the results
-            document.getElementById('output').textContent = results.trim();
+            document.getElementById('output').textContent = results;
             document.getElementById('results').style.display = 'block';
         });
     </script>
