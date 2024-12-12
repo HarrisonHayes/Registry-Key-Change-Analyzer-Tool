@@ -24,8 +24,8 @@
             border-radius: 10px;
             box-shadow: 0 4px 20px rgba(0, 255, 0, 0.3);
             width: 100%;
-            max-width: 700px;  /* Increased max-width for better use of space */
-            box-sizing: border-box;  /* Prevents padding from affecting container size */
+            max-width: 700px;
+            box-sizing: border-box;
         }
 
         h1 {
@@ -54,7 +54,7 @@
         }
 
         textarea {
-            height: 120px;  /* Increased height for better visibility */
+            height: 120px;
         }
 
         button {
@@ -76,7 +76,7 @@
             padding: 10px;
             border-radius: 5px;
             border: 1px solid #3a3d41;
-            word-wrap: break-word;  /* Ensures long lines are wrapped */
+            word-wrap: break-word;
         }
 
         /* Responsive adjustments */
@@ -118,8 +118,8 @@
         /* Ensure the body and container stretch across all viewports */
         @media (min-width: 320px) and (max-width: 1440px) {
             body {
-                height: auto; /* Allow body to adjust based on content size */
-                padding: 10px; /* Small padding on sides for smaller screens */
+                height: auto;
+                padding: 10px;
             }
         }
     </style>
@@ -151,7 +151,7 @@
             const originalKey = document.getElementById('originalKey').value.trim();
             const newKey = document.getElementById('newKey').value.trim();
 
-            // Split the keys by '|' to handle multiple values
+            // Split the keys by '|' to handle multiple values, format: KeyPath|DataType|Value
             const originalValues = originalKey.split('|').map(val => val.trim());
             const newValues = newKey.split('|').map(val => val.trim());
 
@@ -164,15 +164,29 @@
                 const originalValue = originalValues[i] || 'None';
                 const newValue = newValues[i] || 'None';
 
-                if (originalValue !== newValue) {
-                    // Extract file names (last part after the last backslash)
-                    const originalFileName = originalValue.split('\\').pop();
-                    const newFileName = newValue.split('\\').pop();
+                // Split each value into key, type, and data
+                const [originalKeyPath, originalDataType, originalDataValue] = originalValue.split('|');
+                const [newKeyPath, newDataType, newDataValue] = newValue.split('|');
+
+                if (originalKeyPath !== newKeyPath || originalDataType !== newDataType || originalDataValue !== newDataValue) {
+                    // Extract file names (last part after the last backslash) for comparison
+                    const originalFileName = originalKeyPath.split('\\').pop();
+                    const newFileName = newKeyPath.split('\\').pop();
 
                     results += `
 Key ${i + 1}:
-Original Value: ${originalValue}
-Changes: ${originalFileName} was changed to ${newFileName}
+Original Key Path: ${originalKeyPath}
+Original Data Type: ${originalDataType}
+Original Value: ${originalDataValue}
+
+New Key Path: ${newKeyPath}
+New Data Type: ${newDataType}
+New Value: ${newDataValue}
+
+Changes: 
+Key Path: ${originalFileName} was changed to ${newFileName}
+Data Type: ${originalDataType} was changed to ${newDataType}
+Data Value: ${originalDataValue} was changed to ${newDataValue}
 `;
                 }
             }
