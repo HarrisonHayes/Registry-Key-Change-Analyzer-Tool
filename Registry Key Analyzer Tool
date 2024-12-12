@@ -141,9 +141,20 @@
             const currentValue = document.getElementById('currentValue').value.trim();
             const changedFrom = document.getElementById('changedFrom').value.trim();
 
-            // Split the data into sets of strings, disregarding order
-            const currentSet = new Set(currentValue.split(',').map(val => val.trim()).filter(Boolean));
-            const changedFromSet = new Set(changedFrom.split(',').map(val => val.trim()).filter(Boolean));
+            if (!currentValue || !changedFrom) {
+                document.getElementById('output').textContent = 'Both fields must be populated.';
+                document.getElementById('results').style.display = 'block';
+                return;
+            }
+
+            // Find the starting key in the current value
+            const startingKey = currentValue.split('|')[0].trim();
+            const currentSubstring = currentValue.substring(currentValue.indexOf(startingKey));
+            const changedFromSubstring = changedFrom.substring(changedFrom.indexOf(startingKey));
+
+            // Split the substrings into sets for comparison
+            const currentSet = new Set(currentSubstring.split('|').map(val => val.trim()).filter(Boolean));
+            const changedFromSet = new Set(changedFromSubstring.split('|').map(val => val.trim()).filter(Boolean));
 
             // Determine additions and removals
             const additions = [...currentSet].filter(item => !changedFromSet.has(item));
@@ -158,7 +169,7 @@
                 results += `${results ? '\n\n' : ''}Removed Values:\n- ${removals.join('\n- ')}`;
             }
             if (!results) {
-                results = 'No changes detected in Value Data.';
+                results = 'No meaningful changes detected in Value Data.';
             }
 
             // Display the results
